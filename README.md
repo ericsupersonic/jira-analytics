@@ -12,8 +12,33 @@
 - ✅ Распределение по приоритетам
 
 ## 🚀 Быстрый старт
-
+```bash
+python main.py
 ### Установка зависимостей
 
 ```bash
 pip install -r requirements.txt
+
+
+фиговый способ запуска через клиент: 
+запускаем pip install dist/jira_analyzer-1.0.0-py3-none-any.whl
+создаем в тоже директории config.yaml
+```bash
+  jira:
+  base_url: "https://issues.apache.org/jira"
+  auth_required: false
+
+query:
+  project_key: "KAFKA"
+  jql: "project = KAFKA AND created >= -365d"
+  max_results: 100
+
+output:
+  output_dir: "output"
+  top_users: 30
+
+features:
+  fetch_changelog: true
+
+
+и запускаем jira-analyzer
