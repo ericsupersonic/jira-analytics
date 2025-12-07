@@ -18,7 +18,7 @@ python main.py
 
 ```bash
 pip install -r requirements.txt
-
+```
 
 фиговый способ запуска через клиент: 
 запускаем pip install dist/jira_analyzer-1.0.0-py3-none-any.whl
@@ -39,6 +39,6 @@ output:
 
 features:
   fetch_changelog: true
-
+```
 
 и запускаем jira-analyzer
