@@ -1,0 +1,3 @@
+[console_scripts]
+jira-analyzer = jira_analyzer.cli:main
+jira-analyzer-init = jira_analyzer.init_config:main
