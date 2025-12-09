@@ -1,9 +1,16 @@
 import pytest
+import sys
+import os
+
+# Добавляем src в path (абсолютный путь)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'src'))
 
 
 @pytest.fixture
 def sample_issue_resolved():
     return {
+        'key': 'TEST-1',  # ← Добавлено
         'fields': {
             'created': '2024-01-01T00:00:00.000000+0000',
             'resolutiondate': '2024-01-11T00:00:00.000000+0000',
@@ -34,8 +41,10 @@ def sample_issue_resolved():
 @pytest.fixture
 def sample_issue_open():
     return {
+        'key': 'TEST-2',  # ← Добавлено
         'fields': {
             'created': '2024-01-01T00:00:00.000000+0000',
+            'resolutiondate': None,  # ← Добавлено для открытых задач
             'status': {'name': 'Open'},
             'assignee': {'displayName': 'Charlie'},
             'reporter': {'displayName': 'Dana'},
@@ -48,6 +57,7 @@ def sample_issue_open():
 @pytest.fixture
 def sample_issue_no_changelog():
     return {
+        'key': 'TEST-3',  # ← Добавлено
         'fields': {
             'created': '2024-01-05T00:00:00.000000+0000',
             'resolutiondate': '2024-01-10T00:00:00.000000+0000',
@@ -62,6 +72,7 @@ def sample_issue_no_changelog():
 @pytest.fixture
 def sample_issues_list():
     issue1 = {
+        'key': 'TEST-1',  # ← Добавлено
         'fields': {
             'created': '2024-01-01T00:00:00.000000+0000',
             'resolutiondate': '2024-01-11T00:00:00.000000+0000',
@@ -89,6 +100,7 @@ def sample_issues_list():
     }
 
     issue2 = {
+        'key': 'TEST-2',  # ← Добавлено
         'fields': {
             'created': '2024-01-02T00:00:00.000000+0000',
             'resolutiondate': '2024-01-07T00:00:00.000000+0000',
