@@ -11,7 +11,8 @@ setup(
     description="Инструмент для анализа данных из JIRA",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(),
+    py_modules=['jira_client', 'data_processor', 'visualizer', 'cli', 'init_config'],  # ← файлы напрямую
+    package_dir={'': 'src'},  # ← они в src/
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -25,9 +26,9 @@ setup(
         'PyYAML>=6.0',
     ],
     entry_points={
-    'console_scripts': [
-        'jira-analyzer=jira_analyzer.cli:main',
-        'jira-analyzer-init=jira_analyzer.init_config:main',
-    ],
-},
+        'console_scripts': [
+            'jira-analyzer=jira_analyzer.cli:main',
+            'jira-analyzer-init=jira_analyzer.init_config:main',
+        ],
+    },
 )

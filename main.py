@@ -1,19 +1,59 @@
 import os
 import sys
 import yaml
+import argparse
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from jira_analyzer import JiraClient, DataProcessor, Visualizer
+# Определяем корневую директорию проекта (где находится main.py)
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# Добавляем src/ в путь
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'src'))
+
+from jira_client import JiraClient
+from data_processor import DataProcessor
+from visualizer import Visualizer
+
+
+def parse_args():
+    """Парсинг аргументов командной строки"""
+    parser = argparse.ArgumentParser(description='JIRA Analyzer - analyze JIRA issues and generate charts')
+    parser.add_argument('-p', '--project', type=str, help='Project key (e.g., KAFKA, HDFS)')
+    parser.add_argument('-n', '--max-results', type=int, help='Maximum number of issues to fetch')
+    parser.add_argument('-c', '--config', type=str, help='Path to config file')
+    return parser.parse_args()
 
 
 def load_config(config_path=None):
     if config_path is None:
-        for path in ['config.yaml', 'config.yml', 'config.ini']:
+        # Ищем в config/ и в корне
+        for path in ['config/config.yaml', 'config.yaml', 'config/config.yml', 'config.yml']:
             if os.path.exists(path):
                 config_path = path
                 break
         else:
-            raise FileNotFoundError("Config file not found")
+            # Создаем config автоматически
+            print("⚠️  Config not found, creating default config/config.yaml...")
+            os.makedirs('config', exist_ok=True)
+            config_path = 'config/config.yaml'
+            default_config = """jira:
+  base_url: "https://issues.apache.org/jira"
+  auth_required: false
+
+query:
+  project_key: "KAFKA"
+  jql: "project = KAFKA AND created >= -365d"
+  max_results: 1000
+
+output:
+  output_dir: "output"
+  top_users: 30
+
+features:
+  fetch_changelog: true
+"""
+            with open(config_path, 'w', encoding='utf-8') as f:
+                f.write(default_config)
+            print(f"✅ Created {config_path}")
     
     print(f"   Config: {config_path}")
     
@@ -51,22 +91,38 @@ def main():
     print("=" * 60)
     print()
     
+    # Парсим аргументы
+    args = parse_args()
+    
     try:
         print("📋 Loading config...")
-        config = load_config()
+        config = load_config(args.config)
         
         jira_cfg = config['jira']
         query_cfg = config['query']
         output_cfg = config['output']
         features_cfg = config.get('features', {})
         
-        jql = query_cfg.get('jql') or f"project = {query_cfg.get('project_key')} AND created >= -365d"
-        max_results = query_cfg.get('max_results', 1000) or None
-        output_dir = output_cfg.get('output_dir', 'output')
+        # Переопределяем из аргументов командной строки
+        project_key = args.project or query_cfg.get('project_key', 'KAFKA')
+        max_results = args.max_results or query_cfg.get('max_results', 1000) or None
+        
+        # Формируем JQL
+        jql = query_cfg.get('jql')
+        if not jql:
+            jql = f"project = {project_key} AND created >= -365d"
+        elif args.project:
+            # Если указан проект в аргументах, заменяем его в JQL
+            import re
+            jql = re.sub(r'project\s*=\s*\w+', f'project = {project_key}', jql)
+        
+        output_dir = os.path.join(PROJECT_ROOT, output_cfg.get('output_dir', 'output'))
         top_users = output_cfg.get('top_users', 30)
         fetch_changelog = features_cfg.get('fetch_changelog', True)
         
         print(f"   URL: {jira_cfg['base_url']}")
+        print(f"   Project: {project_key}")
+        print(f"   Max results: {max_results if max_results else 'all'}")
         print(f"   JQL: {jql}")
         print()
         
