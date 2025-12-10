@@ -2,10 +2,6 @@
 
 Инструмент для анализа данных из JIRA и построения аналитических графиков.
 
-![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
-![Tests](https://img.shields.io/badge/tests-29%20passed-brightgreen.svg)
-![Coverage](https://img.shields.io/badge/coverage-73%25-yellow.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## 📋 Возможности
 
